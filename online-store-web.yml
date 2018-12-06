@@ -3,33 +3,6 @@ spring:
     active: development
 ---
 spring:
-  profiles: cloud
-  application:
-    name: online-store-web
-zuul:
-  ignored-services: '*'
-  routes:
-    edge-service:
-      path: /api/**
-      url: ${vcap.services.edge-service.credentials.uri:http://localhost:9999}
-    auth-service:
-      path: /user/**
-      url: ${vcap.services.user-service.credentials.uri:http://localhost:8181}/uaa/user
-    user-service:
-      path: /users/**
-security:
-  enable-csrf: false
-  oauth2:
-    resource:
-      userInfoUri: ${vcap.services.user-service.credentials.uri:http://localhost:8181}/uaa/user
-    client:
-      accessTokenUri: ${vcap.services.user-service.credentials.uri:http://localhost:8181}/uaa/oauth/token
-      userAuthorizationUri: ${vcap.services.user-service.credentials.uri:http://localhost:8181}/uaa/oauth/authorize
-      clientId: acme
-      clientSecret: acmesecret
-  ignored: /assets/**
----
-spring:
   profiles: development
   application:
     name: online-store-web
@@ -42,8 +15,6 @@ zuul:
     auth-service:
       path: /user/**
       url: http://localhost:8181/uaa/user
-    user-service:
-      path: /users/**
 security:
   enable-csrf: false
   oauth2:
@@ -54,6 +25,7 @@ security:
       userAuthorizationUri: http://localhost:8181/uaa/oauth/authorize
       clientId: acme
       clientSecret: acmesecret
+  ignored: /assets/**
 eureka:
   instance:
     non-secure-port: 8787
@@ -68,6 +40,8 @@ spring:
   profiles: docker
   application:
     name: online-store-web
+  zipkin:
+    base-url: http://zipkin:9411/
 zuul:
   ignored-services: '*'
   routes:
@@ -77,8 +51,6 @@ zuul:
     auth-service:
       path: /user/**
       url: http://${DOCKER_IP:192.168.99.100}:8181/uaa/user
-    user-service:
-      path: /users/**
 security:
   enable-csrf: false
   oauth2:
@@ -91,10 +63,14 @@ security:
       clientSecret: acmesecret
 eureka:
   instance:
+    leaseRenewalIntervalInSeconds: 10
+    metadataMap:
+      instanceId: ${vcap.application.instance_id:${spring.application.name}:${server.port:8080}}
     non-secure-port: 8787
     prefer-ip-address: true
   client:
     registerWithEureka: true
     fetchRegistry: true
     serviceUrl:
-      defaultZone: http://discovery-service:8761/eureka/
+      defaultZone: ${vcap.services.service-registry.credentials.uri:http://127.0.0.1:8761}/eureka/
+      #defaultZone: http://discovery-service:8761/eureka/
