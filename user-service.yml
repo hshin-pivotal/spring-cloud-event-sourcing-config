@@ -3,8 +3,8 @@ spring:
     active: development
 
 ---
-server:
-  contextPath: /uaa
+#server:
+#  contextPath: /uaa
 security:
   user:
     password: password
