@@ -2,8 +2,6 @@ spring:
   profiles:
     active: development
 
-greeting: from Git!
-
 ---
 server:
   contextPath: /uaa
@@ -11,6 +9,9 @@ security:
   user:
     password: password
   enable-csrf: false
+
+greeting: from Git!
+
 spring:
   profiles: cloud
 security.ignored: /resources/**
