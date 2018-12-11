@@ -1,6 +1,9 @@
 spring:
   profiles:
     active: development
+
+greeting: from Git!
+
 ---
 server:
   contextPath: /uaa
